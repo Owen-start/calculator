@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第一桶金計算機｜薪水族存錢必備工具</title>
+<meta name="description" content="輸入月薪、存錢比例與利率，立刻算出你幾年後能存到第一桶金。免費、免登入、直接用。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --green-dark:   #0A5C46;
+    --green-mid:    #1D9E75;
+    --green-light:  #9FE1CB;
+    --green-pale:   #E1F5EE;
+    --red-mid:      #E24B4A;
+    --red-pale:     #FCEBEB;
+    --amber:        #EF9F27;
+    --ink:          #1A1A1A;
+    --ink-2:        #4A4A4A;
+    --ink-3:        #888780;
+    --bg:           #F5F4F0;
+    --surface:      #FFFFFF;
+    --border:       rgba(0,0,0,0.09);
+    --radius:       14px;
+    --radius-sm:    8px;
+  }
+
+  body {
+    font-family: 'Noto Sans TC', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  /* ── Header ── */
+  header {
+    background: var(--green-dark);
+    color: #fff;
+    text-align: center;
+    padding: 48px 24px 40px;
+  }
+  .header-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    background: rgba(255,255,255,0.15);
+    border-radius: 20px;
+    padding: 4px 14px;
+    margin-bottom: 16px;
+    color: var(--green-light);
+  }
+  header h1 {
+    font-size: clamp(26px, 5vw, 38px);
+    font-weight: 700;
+    line-height: 1.25;
+    margin-bottom: 10px;
+  }
+  header p {
+    font-size: 15px;
+    color: rgba(255,255,255,0.7);
+    max-width: 440px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  /* ── Layout ── */
+  .container {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 32px 20px 60px;
+  }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+  .card-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink-3);
+    letter-spacing: 0.06em;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+  }
+
+  /* ── Sliders ── */
+  .slider-group { margin-bottom: 20px; }
+  .slider-group:last-child { margin-bottom: 0; }
+  .slider-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 8px;
+  }
+  .slider-label { font-size: 14px; color: var(--ink-2); }
+  .slider-value { font-size: 18px; font-weight: 700; color: var(--ink); }
+  .slider-value span { font-size: 13px; font-weight: 400; color: var(--ink-3); margin-left: 2px; }
+
+  input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 4px;
+    background: #E0DED8;
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--green-mid);
+    border: 3px solid var(--surface);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+  input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
+  input[type="range"]::-moz-range-thumb {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--green-mid);
+    border: 3px solid var(--surface);
+    cursor: pointer;
+  }
+
+  /* ── Result hero ── */
+  .result-hero {
+    background: var(--green-dark);
+    border-radius: var(--radius);
+    padding: 28px 24px;
+    color: #fff;
+    margin-bottom: 16px;
+    text-align: center;
+  }
+  .result-hero-lbl {
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    color: var(--green-light);
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .result-hero-num {
+    font-size: clamp(36px, 8vw, 52px);
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 4px;
+    letter-spacing: -0.02em;
+  }
+  .result-hero-unit {
+    font-size: 14px;
+    color: rgba(255,255,255,0.6);
+  }
+  .result-sub-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  .result-sub {
+    background: rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 12px 8px;
+    text-align: center;
+  }
+  .result-sub-lbl { font-size: 10px; color: rgba(255,255,255,0.55); margin-bottom: 4px; letter-spacing: 0.04em; }
+  .result-sub-val { font-size: 15px; font-weight: 700; color: #fff; }
+  .result-sub-val.accent { color: var(--green-light); }
+
+  /* ── Milestones ── */
+  .ms-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  .ms-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 16px 10px;
+    text-align: center;
+    transition: all 0.25s;
+  }
+  .ms-card.reached {
+    background: var(--green-pale);
+    border-color: var(--green-mid);
+  }
+  .ms-target {
+    font-size: 12px;
+    color: var(--ink-3);
+    margin-bottom: 4px;
+    font-weight: 500;
+  }
+  .ms-card.reached .ms-target { color: var(--green-dark); }
+  .ms-years { font-size: 26px; font-weight: 700; color: var(--ink); line-height: 1; }
+  .ms-card.reached .ms-years { color: var(--green-dark); }
+  .ms-lbl { font-size: 11px; color: var(--ink-3); margin-top: 2px; }
+  .ms-card.reached .ms-lbl { color: var(--green-mid); }
+
+  /* ── Bar chart ── */
+  .bar-chart { display: flex; flex-direction: column; gap: 7px; }
+  .bar-row { display: flex; align-items: center; gap: 10px; }
+  .bar-yr { font-size: 11px; color: var(--ink-3); min-width: 28px; text-align: right; }
+  .bar-track {
+    flex: 1;
+    height: 22px;
+    background: var(--bg);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+  }
+  .bar-inner { display: flex; height: 100%; transition: width 0.35s; }
+  .bar-principal { background: var(--green-mid); }
+  .bar-interest { background: var(--green-light); }
+  .bar-amt { font-size: 11px; color: var(--ink-3); min-width: 62px; text-align: right; }
+  .legend {
+    display: flex;
+    gap: 14px;
+    margin-top: 10px;
+  }
+  .leg { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--ink-3); }
+  .leg-dot { width: 10px; height: 10px; border-radius: 3px; }
+
+  /* ── Tips ── */
+  .tip-list { list-style: none; }
+  .tip-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    color: var(--ink-2);
+    line-height: 1.5;
+  }
+  .tip-list li:last-child { border-bottom: none; padding-bottom: 0; }
+  .tip-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--green-mid);
+    flex-shrink: 0;
+    margin-top: 7px;
+  }
+
+  /* ── Footer ── */
+  footer {
+    background: var(--green-dark);
+    color: rgba(255,255,255,0.6);
+    text-align: center;
+    padding: 28px 24px;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+  footer strong { color: #fff; }
+
+  /* ── Section label ── */
+  .section-lbl {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  @media (max-width: 420px) {
+    .result-sub-grid { grid-template-columns: 1fr 1fr; }
+    .result-sub:last-child { grid-column: 1 / -1; }
+    .ms-years { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-tag">免費工具</div>
+  <h1>第一桶金計算機</h1>
+  <p>輸入你的月薪與存錢比例，立刻看到幾年後能存到多少。改變比例，改變命運。</p>
+</header>
+
+<div class="container">
+
+  <!-- 輸入區 -->
+  <div class="card">
+    <div class="card-title">輸入你的條件</div>
+
+    <div class="slider-group">
+      <div class="slider-top">
+        <span class="slider-label">月薪</span>
+        <div class="slider-value"><span id="salary-val">35,000</span><span>元</span></div>
+      </div>
+      <input type="range" id="salary" min="20000" max="100000" step="1000" value="35000" oninput="calc()">
+    </div>
+
+    <div class="slider-group">
+      <div class="slider-top">
+        <span class="slider-label">每月存款比例</span>
+        <div class="slider-value"><span id="pct-val">10</span><span>%</span></div>
+      </div>
+      <input type="range" id="pct" min="5" max="50" step="5" value="10" oninput="calc()">
+    </div>
+
+    <div class="slider-group">
+      <div class="slider-top">
+        <span class="slider-label">年利率（數位帳戶 / 定存）</span>
+        <div class="slider-value"><span id="rate-val">2.0</span><span>%</span></div>
+      </div>
+      <input type="range" id="rate" min="1" max="6" step="0.5" value="2" oninput="calc()">
+    </div>
+  </div>
+
+  <!-- 主結果 -->
+  <div class="result-hero">
+    <div class="result-hero-lbl">10 年後累積金額</div>
+    <div class="result-hero-num" id="result-10y">—</div>
+    <div class="result-hero-unit">元（含複利）</div>
+    <div class="result-sub-grid">
+      <div class="result-sub">
+        <div class="result-sub-lbl">每月存入</div>
+        <div class="result-sub-val" id="monthly-save">—</div>
+      </div>
+      <div class="result-sub">
+        <div class="result-sub-lbl">10 年本金</div>
+        <div class="result-sub-val" id="principal-10">—</div>
+      </div>
+      <div class="result-sub">
+        <div class="result-sub-lbl">複利利息</div>
+        <div class="result-sub-val accent" id="interest-10">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 里程碑 -->
+  <div class="card">
+    <div class="card-title">存到各目標需要幾年？</div>
+    <div class="ms-grid">
+      <div class="ms-card" id="ms-50">
+        <div class="ms-target">50 萬</div>
+        <div class="ms-years" id="ms-50-val">—</div>
+        <div class="ms-lbl">年</div>
+      </div>
+      <div class="ms-card" id="ms-100">
+        <div class="ms-target">100 萬</div>
+        <div class="ms-years" id="ms-100-val">—</div>
+        <div class="ms-lbl">年</div>
+      </div>
+      <div class="ms-card" id="ms-300">
+        <div class="ms-target">300 萬</div>
+        <div class="ms-years" id="ms-300-val">—</div>
+        <div class="ms-lbl">年</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 長條圖 -->
+  <div class="card">
+    <div class="card-title">逐年累積金額（前 10 年）</div>
+    <div class="bar-chart" id="bar-chart"></div>
+    <div class="legend">
+      <div class="leg"><div class="leg-dot" style="background:var(--green-mid)"></div>本金</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--green-light)"></div>複利利息</div>
+    </div>
+  </div>
+
+  <!-- 加速存錢 tips -->
+  <div class="card">
+    <div class="card-title">讓速度再加快</div>
+    <ul class="tip-list">
+      <li><span class="tip-dot"></span>加薪後，把加薪的 50% 直接調高存款比例，維持原本生活水準</li>
+      <li><span class="tip-dot"></span>年終獎金整筆轉入存錢帳戶，不要「先犒賞自己」再存剩下的</li>
+      <li><span class="tip-dot"></span>累積超過 5 萬後，把錢從活存轉定存或高息數位帳戶，利率翻倍</li>
+      <li><span class="tip-dot"></span>設定薪資入帳當天自動轉帳，不靠意志力，靠系統</li>
+    </ul>
+  </div>
+
+</div>
+
+<footer>
+  <strong>改變順序，改變命運。</strong><br>
+  這是「薪水族必學的先付給自己法則」系列工具<br>
+  每週學一個讓錢增加的方法 → 追蹤 IG
+</footer>
+
+<script>
+  function fmt(n) {
+    return Math.round(n).toLocaleString('zh-TW');
+  }
+
+  function calcYears(monthly, rate, target) {
+    let total = 0;
+    const mr = rate / 100 / 12;
+    for (let m = 1; m <= 600; m++) {
+      total = total * (1 + mr) + monthly;
+      if (total >= target) return Math.ceil(m / 12);
+    }
+    return '>50';
+  }
+
+  function calc() {
+    const salary  = parseInt(document.getElementById('salary').value);
+    const pct     = parseInt(document.getElementById('pct').value);
+    const rate    = parseFloat(document.getElementById('rate').value);
+    const monthly = Math.round(salary * pct / 100);
+    const mr      = rate / 100 / 12;
+
+    document.getElementById('salary-val').textContent = salary.toLocaleString('zh-TW');
+    document.getElementById('pct-val').textContent    = pct;
+    document.getElementById('rate-val').textContent   = rate.toFixed(1);
+    document.getElementById('monthly-save').textContent = fmt(monthly) + ' 元';
+
+    // 10年計算
+    let total10 = 0;
+    for (let m = 0; m < 120; m++) total10 = total10 * (1 + mr) + monthly;
+    const principal10 = monthly * 120;
+    const interest10  = total10 - principal10;
+
+    document.getElementById('result-10y').textContent  = fmt(total10);
+    document.getElementById('principal-10').textContent = fmt(principal10) + ' 元';
+    document.getElementById('interest-10').textContent  = '+' + fmt(interest10) + ' 元';
+
+    // 里程碑
+    const milestones = [
+      { id: 'ms-50',  target: 500000 },
+      { id: 'ms-100', target: 1000000 },
+      { id: 'ms-300', target: 3000000 },
+    ];
+    milestones.forEach(({ id, target }) => {
+      const yrs  = calcYears(monthly, rate, target);
+      const card = document.getElementById(id);
+      const val  = document.getElementById(id + '-val');
+      val.textContent = yrs;
+      card.className  = 'ms-card' + (typeof yrs === 'number' && yrs <= 35 ? ' reached' : '');
+    });
+
+    // 長條圖
+    const chart = document.getElementById('bar-chart');
+    chart.innerHTML = '';
+    let maxAmt = 0;
+    const yearly = [];
+    let running = 0;
+    for (let y = 1; y <= 10; y++) {
+      for (let m = 0; m < 12; m++) running = running * (1 + mr) + monthly;
+      yearly.push(running);
+      if (running > maxAmt) maxAmt = running;
+    }
+    yearly.forEach((amt, i) => {
+      const principal = monthly * 12 * (i + 1);
+      const interest  = amt - principal;
+      const totalPct  = Math.round(amt / maxAmt * 100);
+      const pPct      = Math.round(principal / amt * 100);
+      const row = document.createElement('div');
+      row.className = 'bar-row';
+      row.innerHTML = `
+        <span class="bar-yr">${i + 1}年</span>
+        <div class="bar-track">
+          <div class="bar-inner" style="width:${totalPct}%">
+            <div class="bar-principal" style="width:${pPct}%"></div>
+            <div class="bar-interest" style="flex:1"></div>
+          </div>
+        </div>
+        <span class="bar-amt">${fmt(amt)}</span>`;
+      chart.appendChild(row);
+    });
+  }
+
+  calc();
+</script>
+</body>
+</html>
